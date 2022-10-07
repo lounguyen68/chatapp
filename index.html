@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatApp</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;1,100;1,200;1,300;1,400;1,500;1,600&family=Roboto:wght@300;400;500;700&display=swap');
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Poppins', sans-serif;
+        height: 100vh;
+        background-image: linear-gradient( 45deg, rgb(65, 88, 208) 0%, rgb(200, 80, 192) 50%, rgb(255, 204, 112) 100% );
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .container {
+        width: 300px;
+        height: 400px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background-color: #000;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+    .header {
+        position: fixed;
+        width: 300px;
+        height: 50px;
+        color: #fff;
+        background-image: linear-gradient( 45deg, rgb(65, 88, 208) 0%, rgb(200, 80, 192) 50%, rgb(255, 204, 112) 100% );
+        border-radius: 5px; 
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    
+    }
+    .header p {
+        font-size: 10px;
+        padding: 10px;
+    }
+    h4 {
+        margin-left: 5px;
+    }
+    .content {
+        margin-top: 50px;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    .mess {
+        margin-bottom: 5px;
+        overflow-y: scroll;
+    }
+    .mess::-webkit-scrollbar {
+        display: none;
+    }
+    .mess-item {
+        background-color: rgb(65, 88, 208);
+        color: #fff;
+        border-radius: 10px;
+        padding: 5px;
+        margin: 5px;
+        width: fit-content;
+    }
+    p {
+        margin-left: 5px;
+        font-size: 15px;
+    }
+    .textbox {
+        position: fixed;
+        background-image: linear-gradient( 45deg, rgb(65, 88, 208) 0%, rgb(200, 80, 192) 50%, rgb(255, 204, 112) 100% );
+        border-radius: 5px;
+        bottom: 10px;
+        width: 300px;
+        height: 40px;
+        padding: 5px;
+        border-top: 1px solid #000;
+        display: flex;
+        align-items: center;
+    }
+    #chat-form {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #message {
+        width: 85%;
+        padding: 5px;
+        outline: none;
+        border: none;
+        border-radius: 10px;
+        background-color: rgba(15, 9, 9, 0.553);
+        color: #fff;
+    }
+    .chat-btn {
+        background-image: linear-gradient( 45deg, rgb(65, 88, 208) 0%, rgb(200, 80, 192) 50%, rgb(255, 204, 112) 100% );
+        outline: none;
+        border: none;
+        padding: 5px;
+        border-radius: 5px;
+    }
+    .modal-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+    .modal {
+        background-image: linear-gradient( 45deg, rgb(65, 88, 208) 0%, rgb(200, 80, 192) 50%, rgb(255, 204, 112) 100% ); 
+        
+        padding: 5px;
+        border-radius: 5px;
+    }
+    #chat-name {
+        display: flex;
+        flex-direction: column;
+    }
+    #name {
+        padding: 5px;
+        outline: none;
+        border-radius: 5px;
+        border: none;
+    }
+    .hide {
+        display: none;
+    }
+    @media (max-width: 768px) {
+        .container {
+            width: 90vw;
+            height: 80vh;
+        }
+        .header, .textbox {
+            width: 90vw;
+        }
+    }
+    @media (max-width: 960px)and (min-width: 769px) {
+        .container {
+            height: 80vh;
+            width: 80vw;
+        }
+        .header, .textbox {
+            width: 80vw;
+        }
+        
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h4>Forum Voz</h4>
+        </div>
+        <div class="content">
+            <div class="mess">
+            </div>
+            <div class="textbox">
+                <form id="chat-form">
+                    <input id="message" class="chat-mes" type="text" placeholder="Aa">
+                    <button class="chat-btn" type="submit">Gửi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-wrapper">
+        <div class="modal">
+            <form action="" id="chat-name">
+                <label for="name">Nhập tên của bạn:</label>
+                <input type="text" id="name">
+            </form>
+        </div>
+    </div>
+</body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    const header = document.querySelector('.header');
+    const chatForm = document.querySelector('#chat-form');
+    const chatMes = document.querySelector('.chat-mes');
+    const nameForm = document.querySelector('#chat-name');
+    const chatName = document.querySelector('#name');
+    let username = '';
+    nameForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (chatName.value) {
+            username = chatName.value;
+            nameForm.parentElement.parentElement.classList.toggle('hide');
+            const p = document.createElement('p');
+            p.textContent = username;
+            header.appendChild(p);
+        }
+    })
+     
+    chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const message = chatMes.value;
+        if (message) {
+            socket.emit('on-chat', {
+                username,
+                message
+            });
+        };
+        chatMes.value = '';
+    });
+    const messages = document.querySelector('.mess')
+    socket.on('user-chat', (message) => {
+        messages.innerHTML +=`
+                <div class="mess-item">
+                    <p>${username}: ${message.message}</p>
+                </div>
+        `;
+    } )
+</script>
+</html>
