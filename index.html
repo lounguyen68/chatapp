@@ -221,10 +221,10 @@
         chatMes.value = '';
     });
     const messages = document.querySelector('.mess')
-    socket.on('user-chat', (message) => {
+    socket.on('user-chat', (data) => {
         messages.innerHTML +=`
                 <div class="mess-item">
-                    <p>${username}: ${message.message}</p>
+                    <p>${data.username}: ${data.message}</p>
                 </div>
         `;
     } )
