@@ -60,6 +60,8 @@
     .mess {
         margin-bottom: 5px;
         overflow-y: scroll;
+        display: flex;
+        flex-direction: column;
     }
     .mess::-webkit-scrollbar {
         display: none;
@@ -71,6 +73,9 @@
         padding: 5px;
         margin: 5px;
         width: fit-content;
+    }
+    .mess-item.mine {
+        align-self: flex-end;
     }
     p {
         margin-left: 5px;
@@ -168,6 +173,7 @@
         </div>
         <div class="content">
             <div class="mess">
+
             </div>
             <div class="textbox">
                 <form id="chat-form">
@@ -181,7 +187,10 @@
         <div class="modal">
             <form action="" id="chat-name">
                 <label for="name">Nhập tên của bạn:</label>
-                <input type="text" id="name">
+                <div class="name-wrapper">
+                    <input type="text" id="name">
+                    <button class="chat-btn" type="submit">OK</button>
+                </div>
             </form>
         </div>
     </div>
@@ -222,11 +231,19 @@
     });
     const messages = document.querySelector('.mess')
     socket.on('user-chat', (data) => {
-        messages.innerHTML +=`
+        if (username == data.username) {
+            messages.innerHTML +=`
+                <div class="mess-item mine">
+                    <p>${data.username}: ${data.message}</p>
+                </div>
+            `;
+        } else {
+            messages.innerHTML +=`
                 <div class="mess-item">
                     <p>${data.username}: ${data.message}</p>
                 </div>
-        `;
+            `;
+        }
     } )
 </script>
 </html>
